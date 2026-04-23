@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreProductRequest extends FormRequest
 {
@@ -16,9 +17,7 @@ class StoreProductRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array[]
      */
     public function rules(): array
     {
@@ -39,5 +38,15 @@ class StoreProductRequest extends FormRequest
             'category_id.required' => 'Категория обязательна',
             'category_id.exists'   => 'Выбранная категория не существует',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'message' => 'Ошибка валидации',
+                'errors'  => $validator->errors(),
+            ], 422)
+        );
     }
 }
