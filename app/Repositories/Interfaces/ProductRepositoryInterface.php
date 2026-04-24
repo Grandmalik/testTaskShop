@@ -7,7 +7,7 @@ use App\Models\Product;
 
 interface ProductRepositoryInterface
 {
-    public function getPaginated(int $perPage = 10, ?int $categoryId = null): LengthAwarePaginator;
+    public function getPaginated(int $perPage = 10, ?int $categoryId = null, ?string $search = null): LengthAwarePaginator;
     public function findById(int $id): ?Product;
     public function create(array $data): Product;
     public function update(Product $product, array $data): Product;

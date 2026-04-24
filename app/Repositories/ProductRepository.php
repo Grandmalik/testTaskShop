@@ -12,11 +12,15 @@ class ProductRepository implements ProductRepositoryInterface
         private readonly Product $model
     ) {}
 
-    public function getPaginated(int $perPage = 10, ?int $categoryId = null): LengthAwarePaginator
+    public function getPaginated(int $perPage = 10, ?int $categoryId = null, ?string $search = null): LengthAwarePaginator
     {
         return $this->model
             ->with('category')
-            ->when($categoryId, fn($query) => $query->where('category_id', $categoryId))
+            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($search, fn($q) => $q->where(function ($q) use ($search) {
+                $q->whereRaw('name ILIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('description ILIKE ?', ["%{$search}%"]);
+            }))
             ->orderByDesc('created_at')
             ->paginate($perPage);
     }

@@ -17,16 +17,22 @@ class ProductController extends Controller
         private readonly ProductService $productService
     ) {}
 
+    // 200 OK — список
     public function index(Request $request): ProductCollection
     {
+        $perPage = $request->integer('per_page', 10);
+        $perPage = in_array($perPage, [10, 12, 15]) ? $perPage : 10;
+
         $products = $this->productService->getPaginated(
-            perPage: 10,
-            categoryId: $request->integer('category_id') ?: null
+            perPage:    $perPage,
+            categoryId: $request->integer('category_id') ?: null,
+            search:     $request->string('search')->trim()->value() ?: null,
         );
 
         return new ProductCollection($products);
     }
 
+    // 200 OK — один товар
     public function show(int $id): ProductResource
     {
         $product = $this->productService->findOrFail($id);
@@ -34,6 +40,7 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
+    // 201 Created — создание
     public function store(StoreProductRequest $request): JsonResponse
     {
         $product = $this->productService->create($request->validated());
@@ -43,6 +50,7 @@ class ProductController extends Controller
             ->setStatusCode(201);
     }
 
+    // 200 OK — обновление
     public function update(UpdateProductRequest $request, int $id): ProductResource
     {
         $product = $this->productService->update($id, $request->validated());
@@ -50,10 +58,11 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
+    // 204 — удаление
     public function destroy(int $id): JsonResponse
     {
         $this->productService->delete($id);
 
-        return response()->json(['message' => 'Товар удалён'], 200);
+        return response()->json(null, 204);
     }
 }

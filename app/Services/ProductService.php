@@ -12,9 +12,9 @@ class ProductService
         private readonly ProductRepositoryInterface $productRepository
     ) {}
 
-    public function getPaginated(int $perPage = 10, ?int $categoryId = null): LengthAwarePaginator
+    public function getPaginated(int $perPage = 10, ?int $categoryId = null, ?string $search = null): LengthAwarePaginator
     {
-        return $this->productRepository->getPaginated($perPage, $categoryId);
+        return $this->productRepository->getPaginated($perPage, $categoryId, $search);
     }
 
     public function findOrFail(int $id): Product
